@@ -13,6 +13,7 @@ NERD_FONTS=(
     "SourceCodePro"
     "DejaVuSansMono"
     "Meslo"
+    "CascadiaCode"
 )
 
 install_fonts() {

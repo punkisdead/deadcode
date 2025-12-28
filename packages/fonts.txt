@@ -5,3 +5,4 @@ fonts-noto-color-emoji
 fonts-dejavu
 fonts-liberation
 fonts-firacode
+fonts-jetbrains-mono

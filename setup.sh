@@ -87,6 +87,13 @@ component_menu() {
         "fonts" "Nerd Fonts" "ON" \
         "policykit" "Policykit agent" "ON" \
         "system" "System utilities" "ON" \
+        "devtools" "Developer tools (fzf, ripgrep, cmake, etc.)" "OFF" \
+        "devlibs" "Development libraries" "OFF" \
+        "docker" "Docker Engine" "OFF" \
+        "mise" "mise version manager" "OFF" \
+        "cli-tools" "CLI tools (gh, gcloud, lazygit, etc.)" "OFF" \
+        "editors" "Editors (Doom Emacs, LazyVim, VS Code)" "OFF" \
+        "1password" "1Password password manager" "OFF" \
         "lightdm" "LightDM display manager" "ON" \
         "plymouth" "Plymouth boot splash" "ON" \
         "dotfiles" "User dotfiles" "ON" \
@@ -162,6 +169,34 @@ component_menu() {
             system)
                 source "${SCRIPT_DIR}/install/packages/system.sh"
                 install_system
+                ;;
+            devtools)
+                source "${SCRIPT_DIR}/install/packages/devtools.sh"
+                install_devtools
+                ;;
+            devlibs)
+                source "${SCRIPT_DIR}/install/packages/devlibs.sh"
+                install_devlibs
+                ;;
+            docker)
+                source "${SCRIPT_DIR}/install/packages/docker.sh"
+                install_docker
+                ;;
+            mise)
+                source "${SCRIPT_DIR}/install/packages/mise.sh"
+                install_mise
+                ;;
+            cli-tools)
+                source "${SCRIPT_DIR}/install/packages/cli-tools.sh"
+                install_cli_tools
+                ;;
+            editors)
+                source "${SCRIPT_DIR}/install/packages/editors.sh"
+                install_editors
+                ;;
+            1password)
+                source "${SCRIPT_DIR}/install/packages/1password.sh"
+                install_1password
                 ;;
             lightdm)
                 source "${SCRIPT_DIR}/install/config/lightdm.sh"

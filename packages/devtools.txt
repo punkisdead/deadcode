@@ -1,0 +1,14 @@
+# Developer tools (apt packages)
+fzf
+ripgrep
+direnv
+cmake
+autoconf
+automake
+fastfetch
+ssh-askpass
+gcc
+g++
+make
+gdb
+pandoc

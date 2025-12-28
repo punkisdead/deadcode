@@ -1,0 +1,15 @@
+# Development libraries
+libyaml-dev
+libncurses-dev
+libncursesw6
+libpq-dev
+libgl1-mesa-dev
+libglu1-mesa-dev
+libwxgtk3.2-dev
+libssl-dev
+libffi-dev
+libreadline-dev
+zlib1g-dev
+libbz2-dev
+libsqlite3-dev
+libvterm-dev

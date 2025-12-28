@@ -53,6 +53,25 @@ install_all_packages() {
     source "${PACKAGES_DIR}/system.sh"
     install_system
 
+    # Developer tools and libraries
+    source "${PACKAGES_DIR}/devtools.sh"
+    install_devtools
+
+    source "${PACKAGES_DIR}/devlibs.sh"
+    install_devlibs
+
+    # Docker
+    source "${PACKAGES_DIR}/docker.sh"
+    install_docker
+
+    # Mise version manager
+    source "${PACKAGES_DIR}/mise.sh"
+    install_mise
+
+    # CLI tools (gh, gcloud, lazygit, lazydocker, claude)
+    source "${PACKAGES_DIR}/cli-tools.sh"
+    install_cli_tools
+
     success "All packages installed"
 }
 
