@@ -21,7 +21,10 @@ setup_plymouth() {
     # Configure GRUB for splash
     configure_grub_splash
 
-    # Update initramfs
+    # Configure initramfs to include Plymouth
+    configure_initramfs_plymouth
+
+    # Update initramfs (must be last - includes Plymouth theme)
     update_initramfs
 
     success "Plymouth configured"
@@ -58,84 +61,122 @@ ImageDir=${PLYMOUTH_THEME_DIR}
 ScriptFile=${PLYMOUTH_THEME_DIR}/${PLYMOUTH_THEME_NAME}.script
 EOF
 
-    # Create Plymouth script
+    # Create Plymouth script with proper initialization order
     sudo tee "${PLYMOUTH_THEME_DIR}/${PLYMOUTH_THEME_NAME}.script" > /dev/null << 'SCRIPT'
 # Deadcode Plymouth Theme Script
+# Proper initialization order is critical for cryptsetup integration
 
-# Colors matching the deadcode theme
-bg_color = 0x0f0f0f;
-text_color = 0xe0e0e0;
-accent_color = 0x6366f1;
+# Window setup - must be first
+Window.SetBackgroundTopColor(0.06, 0.06, 0.06);
+Window.SetBackgroundBottomColor(0.06, 0.06, 0.06);
 
-# Window dimensions
-window.width = Window.GetWidth();
-window.height = Window.GetHeight();
+# Get window dimensions
+screen_width = Window.GetWidth();
+screen_height = Window.GetHeight();
 
-# Background
-background_image = Image("background.png");
-background_image = background_image.Scale(window.width, window.height);
-background_sprite = Sprite(background_image);
-background_sprite.SetPosition(0, 0, -100);
-
-# Password prompt styling
-fun dialog_setup() {
-    local.dialog_image = Image("dialog.png");
-    local.dialog_sprite = Sprite(local.dialog_image);
-    local.dialog_sprite.SetPosition(
-        (window.width - local.dialog_image.GetWidth()) / 2,
-        (window.height - local.dialog_image.GetHeight()) / 2,
-        10
-    );
+# Background image (optional - works without it)
+bg_image = Image("background.png");
+if (bg_image) {
+    scaled_bg = bg_image.Scale(screen_width, screen_height);
+    bg_sprite = Sprite(scaled_bg);
+    bg_sprite.SetX(0);
+    bg_sprite.SetY(0);
+    bg_sprite.SetZ(-100);
 }
 
-# Message display
+# Pre-initialize all sprites before callbacks are registered
+prompt_sprite = Sprite();
+bullet_sprite = Sprite();
 message_sprite = Sprite();
-message_sprite.SetPosition(window.width / 2, window.height * 0.75, 10);
 
-fun message_callback(text) {
-    message_image = Image.Text(text, 1, 1, 1);
-    message_sprite.SetImage(message_image);
-    message_sprite.SetPosition(
-        (window.width - message_image.GetWidth()) / 2,
-        window.height * 0.75,
-        10
-    );
-}
+# Password dialog callback - called when LUKS password is needed
+fun display_password_callback(prompt_text, bullet_count) {
+    # Replace default cryptsetup prompt with custom text
+    prompt_text = "Enter disk passphrase:";
 
-# Password prompt
-fun display_password_callback(prompt, bullets) {
-    password_dialog.image = Image.Text(prompt, 0.88, 0.88, 0.88);
-    password_dialog.sprite.SetImage(password_dialog.image);
-    password_dialog.sprite.SetPosition(
-        (window.width - password_dialog.image.GetWidth()) / 2,
-        window.height / 2 + 50,
-        10
-    );
+    # Render the prompt text
+    prompt_image = Image.Text(prompt_text, 0.88, 0.88, 0.88, 1, "Sans 14");
+    prompt_sprite.SetImage(prompt_image);
+    prompt_sprite.SetX(screen_width / 2 - prompt_image.GetWidth() / 2);
+    prompt_sprite.SetY(screen_height / 2);
+    prompt_sprite.SetZ(10);
 
-    # Display bullets for password
-    bullet_string = "";
-    for (i = 0; i < bullets; i++) {
-        bullet_string += "●";
+    # Build bullet string for password feedback
+    bullet_str = "";
+    for (i = 0; i < bullet_count; i++) {
+        bullet_str = bullet_str + "*";
     }
 
-    bullet_image = Image.Text(bullet_string, 0.39, 0.4, 0.95);
-    password_bullet.sprite.SetImage(bullet_image);
-    password_bullet.sprite.SetPosition(
-        (window.width - bullet_image.GetWidth()) / 2,
-        window.height / 2 + 80,
-        10
-    );
+    # Only render bullets if there are any
+    if (bullet_count > 0) {
+        bullet_image = Image.Text(bullet_str, 0.39, 0.40, 0.95, 1, "Sans 16");
+        bullet_sprite.SetImage(bullet_image);
+        bullet_sprite.SetX(screen_width / 2 - bullet_image.GetWidth() / 2);
+        bullet_sprite.SetY(screen_height / 2 + 40);
+        bullet_sprite.SetZ(10);
+    } else {
+        # Clear bullets when empty
+        bullet_sprite.SetImage(Image.Text("", 1, 1, 1));
+    }
 }
 
-# Initialize sprites
-password_dialog.sprite = Sprite();
-password_bullet.sprite = Sprite();
+# Normal password callback (non-LUKS prompts)
+fun display_normal_callback(prompt_text) {
+    prompt_image = Image.Text(prompt_text, 0.88, 0.88, 0.88, 1, "Sans 14");
+    prompt_sprite.SetImage(prompt_image);
+    prompt_sprite.SetX(screen_width / 2 - prompt_image.GetWidth() / 2);
+    prompt_sprite.SetY(screen_height / 2);
+    prompt_sprite.SetZ(10);
+}
 
+# Message callback
+fun message_callback(msg) {
+    # Suppress #NULL and empty messages from cryptsetup
+    if (msg == "#NULL" || msg == "" || msg == NULL) {
+        message_sprite.SetImage(Image.Text("", 0, 0, 0, 0));
+        return;
+    }
+
+    msg_image = Image.Text(msg, 1, 1, 1, 1, "Sans 12");
+    message_sprite.SetImage(msg_image);
+    message_sprite.SetX(screen_width / 2 - msg_image.GetWidth() / 2);
+    message_sprite.SetY(screen_height * 0.75);
+    message_sprite.SetZ(10);
+}
+
+# Register callbacks - must happen after sprite initialization
 Plymouth.SetDisplayPasswordFunction(display_password_callback);
+Plymouth.SetDisplayNormalFunction(display_normal_callback);
 Plymouth.SetMessageFunction(message_callback);
 SCRIPT
 
+    # Register theme with alternatives system (required for Debian)
+    sudo update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth \
+        "${PLYMOUTH_THEME_DIR}/${PLYMOUTH_THEME_NAME}.plymouth" 100
+
     success "Plymouth theme installed"
+}
+
+configure_initramfs_plymouth() {
+    local initramfs_conf="/etc/initramfs-tools/conf.d/plymouth"
+
+    subheader "Configuring initramfs for Plymouth"
+
+    # Create Plymouth initramfs config with LUKS support
+    sudo tee "$initramfs_conf" > /dev/null << 'EOF'
+FRAMEBUFFER=y
+EOF
+
+    # Ensure cryptsetup is included in initramfs for LUKS support
+    local cryptsetup_conf="/etc/initramfs-tools/conf.d/cryptsetup"
+    if [[ -e /dev/mapper/*_crypt ]] || grep -q "_crypt" /etc/crypttab 2>/dev/null; then
+        sudo tee "$cryptsetup_conf" > /dev/null << 'EOF'
+CRYPTSETUP=y
+EOF
+        debug "LUKS detected, enabled cryptsetup in initramfs"
+    fi
+
+    success "Initramfs Plymouth config created"
 }
 
 set_plymouth_theme() {

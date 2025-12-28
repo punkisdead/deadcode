@@ -12,14 +12,14 @@ calc_dimensions() {
     DIALOG_WIDTH=$((TERM_WIDTH - 10))
 
     # Constrain to reasonable sizes
-    [[ $DIALOG_HEIGHT -gt 30 ]] && DIALOG_HEIGHT=30
-    [[ $DIALOG_WIDTH -gt 80 ]] && DIALOG_WIDTH=80
-    [[ $DIALOG_HEIGHT -lt 15 ]] && DIALOG_HEIGHT=15
-    [[ $DIALOG_WIDTH -lt 50 ]] && DIALOG_WIDTH=50
+    [[ $DIALOG_HEIGHT -gt 30 ]] && DIALOG_HEIGHT=30 || true
+    [[ $DIALOG_WIDTH -gt 80 ]] && DIALOG_WIDTH=80 || true
+    [[ $DIALOG_HEIGHT -lt 15 ]] && DIALOG_HEIGHT=15 || true
+    [[ $DIALOG_WIDTH -lt 50 ]] && DIALOG_WIDTH=50 || true
 
     # List height for menus
     LIST_HEIGHT=$((DIALOG_HEIGHT - 8))
-    [[ $LIST_HEIGHT -lt 5 ]] && LIST_HEIGHT=5
+    [[ $LIST_HEIGHT -lt 5 ]] && LIST_HEIGHT=5 || true
 }
 
 # Initialize dimensions

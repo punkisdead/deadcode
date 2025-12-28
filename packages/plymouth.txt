@@ -1,3 +1,4 @@
 # Boot splash
 plymouth
 plymouth-themes
+plymouth-label
