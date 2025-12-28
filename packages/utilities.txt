@@ -1,0 +1,13 @@
+# Desktop utilities
+rofi
+dunst
+libnotify-bin
+feh
+redshift
+redshift-gtk
+flameshot
+maim
+scrot
+nitrogen
+lxappearance
+qt5ct

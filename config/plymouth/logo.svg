@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 180">
+  <defs>
+    <!-- Glow filter for the flatline -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Stronger glow for the spike -->
+    <filter id="spikeGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="180" fill="#0f0f0f"/>
+  
+  <!-- Terminal window frame -->
+  <rect x="25" y="25" width="350" height="130" rx="10" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+  
+  <!-- Terminal header bar -->
+  <rect x="25" y="25" width="350" height="32" rx="10" fill="#1a1a1a"/>
+  <rect x="25" y="47" width="350" height="10" fill="#1a1a1a"/>
+  
+  <!-- Terminal dots -->
+  <circle cx="46" cy="41" r="5" fill="#ff5f57"/>
+  <circle cx="62" cy="41" r="5" fill="#febc2e"/>
+  <circle cx="78" cy="41" r="5" fill="#28c840"/>
+  
+  <!-- Divider line -->
+  <line x1="25" y1="57" x2="375" y2="57" stroke="#2a2a2a" stroke-width="1"/>
+  
+  <!-- Shell prompt -->
+  <text x="50" y="98" font-family="monospace" font-size="28" font-weight="bold" fill="#6366f1">$</text>
+  
+  <!-- deadcode text -->
+  <text x="80" y="98" font-family="SF Mono, Consolas, monospace" font-size="30" font-weight="600" fill="#e0e0e0">deadcode</text>
+  
+  <!-- Blinking cursor -->
+  <rect x="305" y="76" width="12" height="24" fill="#6366f1" opacity="0.85"/>
+  
+  <!-- EKG waveform: P wave, QRS complex (Q dip, R spike, S dip), T wave, then flatline -->
+  <!-- Base glow layer -->
+  <polyline 
+    points="25,132 
+            100,132 
+            112,132 118,127 124,132 
+            132,132 136,135 140,100 148,145 152,132 
+            165,132 172,125 182,132 
+            375,132" 
+    fill="none" 
+    stroke="#ef4444" 
+    stroke-width="6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.15"
+    filter="url(#glow)"/>
+  
+  <!-- Main EKG line -->
+  <polyline 
+    points="25,132 
+            100,132 
+            112,132 118,127 124,132 
+            132,132 136,135 140,100 148,145 152,132 
+            165,132 172,125 182,132 
+            375,132" 
+    fill="none" 
+    stroke="#ef4444" 
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#glow)"/>
+    
+  <!-- Bright QRS complex highlight -->
+  <polyline 
+    points="132,132 136,135 140,100 148,145 152,132" 
+    fill="none" 
+    stroke="#ff6b6b" 
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#spikeGlow)"/>
+</svg>

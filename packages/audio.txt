@@ -1,0 +1,6 @@
+# Audio system
+pulseaudio
+pavucontrol
+pamixer
+pulsemixer
+playerctl

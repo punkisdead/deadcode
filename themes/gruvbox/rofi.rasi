@@ -1,0 +1,77 @@
+/* Gruvbox Dark theme for Rofi */
+
+* {
+    bg: #282828;
+    bg1: #3c3836;
+    bg2: #504945;
+    fg: #ebdbb2;
+    gray: #928374;
+    aqua: #8ec07c;
+    red: #fb4934;
+
+    background-color: @bg;
+    text-color: @fg;
+    border-color: @aqua;
+}
+
+window {
+    background-color: @bg;
+    border: 2px;
+    border-color: @aqua;
+    border-radius: 8px;
+    padding: 20px;
+    width: 600px;
+}
+
+mainbox {
+    background-color: transparent;
+    children: [ inputbar, listview ];
+    spacing: 15px;
+}
+
+inputbar {
+    background-color: @bg1;
+    border-radius: 6px;
+    padding: 12px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    background-color: transparent;
+    text-color: @aqua;
+    padding: 0 10px 0 0;
+}
+
+entry {
+    background-color: transparent;
+    text-color: @fg;
+    placeholder-color: @gray;
+}
+
+listview {
+    background-color: transparent;
+    columns: 1;
+    lines: 8;
+    spacing: 5px;
+}
+
+element {
+    background-color: transparent;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+element selected.normal {
+    background-color: @aqua;
+    text-color: @bg;
+}
+
+element-icon {
+    size: 24px;
+    padding: 0 10px 0 0;
+}
+
+element-text {
+    background-color: transparent;
+    text-color: inherit;
+}

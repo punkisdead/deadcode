@@ -1,0 +1,86 @@
+#!/bin/bash
+# Deadcode - Theme Switcher
+# Usage: deadcode-theme-set <theme-name>
+
+set -euo pipefail
+
+THEMES_DIR="${HOME}/.config/deadcode/themes"
+CURRENT_LINK="${HOME}/.config/deadcode/current/theme"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+usage() {
+    echo "Usage: deadcode-theme-set <theme-name>"
+    echo ""
+    echo "Available themes:"
+    deadcode-theme-list
+    exit 1
+}
+
+set_theme() {
+    local theme="$1"
+    local theme_path="${THEMES_DIR}/${theme}"
+
+    if [[ ! -d "$theme_path" ]]; then
+        echo -e "${RED}Error: Theme '$theme' not found${NC}"
+        echo ""
+        echo "Available themes:"
+        deadcode-theme-list
+        exit 1
+    fi
+
+    echo -e "${BLUE}Setting theme: $theme${NC}"
+
+    # Create directory if needed
+    mkdir -p "$(dirname "$CURRENT_LINK")"
+
+    # Update symlink
+    ln -snf "$theme_path" "$CURRENT_LINK"
+
+    # Reload applications
+    reload_applications
+
+    echo -e "${GREEN}Theme set to: $theme${NC}"
+
+    # Send notification if possible
+    if command -v notify-send &> /dev/null; then
+        notify-send "Theme Changed" "Now using: $theme" -i preferences-desktop-theme
+    fi
+}
+
+reload_applications() {
+    echo "Reloading applications..."
+
+    # Reload i3
+    if command -v i3-msg &> /dev/null && pgrep -x i3 &> /dev/null; then
+        i3-msg reload &> /dev/null || true
+    fi
+
+    # Restart polybar
+    if command -v polybar &> /dev/null && pgrep -x polybar &> /dev/null; then
+        killall polybar 2>/dev/null || true
+        # Give i3 a moment to reload
+        sleep 0.5
+        # Polybar should be started by i3 config, but try to restart it
+        if [[ -f "${HOME}/.config/polybar/launch.sh" ]]; then
+            "${HOME}/.config/polybar/launch.sh" &>/dev/null &
+        fi
+    fi
+
+    # Restart dunst
+    if command -v dunst &> /dev/null && pgrep -x dunst &> /dev/null; then
+        killall dunst 2>/dev/null || true
+        dunst &>/dev/null &
+    fi
+}
+
+# Main
+if [[ $# -eq 0 ]]; then
+    usage
+fi
+
+set_theme "$1"

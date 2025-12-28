@@ -1,0 +1,21 @@
+#!/bin/bash
+# Deadcode - Main Menu
+# Usage: deadcode-menu
+
+set -euo pipefail
+
+# Find deadcode installation
+if [[ -d "${HOME}/.local/share/deadcode" ]]; then
+    DEADCODE_PATH="${HOME}/.local/share/deadcode"
+elif [[ -n "${DEADCODE_PATH:-}" ]]; then
+    : # Use existing DEADCODE_PATH
+else
+    echo "Error: Deadcode installation not found"
+    echo "Expected at: ~/.local/share/deadcode"
+    exit 1
+fi
+
+export DEADCODE_PATH
+
+# Run setup menu
+exec "${DEADCODE_PATH}/setup.sh"

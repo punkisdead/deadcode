@@ -1,0 +1,5 @@
+# i3 window manager and related
+i3
+i3lock
+i3status
+sxhkd

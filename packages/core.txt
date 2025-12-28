@@ -1,0 +1,13 @@
+# Core system packages
+git
+build-essential
+curl
+wget
+stow
+unzip
+zip
+ca-certificates
+gnupg
+lsb-release
+software-properties-common
+apt-transport-https

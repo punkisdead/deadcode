@@ -1,0 +1,15 @@
+# X11 display server and utilities
+xorg
+xserver-xorg
+xserver-xorg-input-all
+xserver-xorg-video-all
+xinit
+xbacklight
+xbindkeys
+xinput
+xvkbd
+xdotool
+xclip
+xsel
+arandr
+autorandr

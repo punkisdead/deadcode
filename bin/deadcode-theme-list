@@ -1,0 +1,29 @@
+#!/bin/bash
+# Deadcode - List Available Themes
+# Usage: deadcode-theme-list
+
+THEMES_DIR="${HOME}/.config/deadcode/themes"
+CURRENT_LINK="${HOME}/.config/deadcode/current/theme"
+
+# Get current theme
+current=""
+if [[ -L "$CURRENT_LINK" ]]; then
+    current=$(basename "$(readlink "$CURRENT_LINK")")
+fi
+
+# List themes
+if [[ -d "$THEMES_DIR" ]]; then
+    for theme_dir in "$THEMES_DIR"/*/; do
+        if [[ -d "$theme_dir" ]]; then
+            theme_name=$(basename "$theme_dir")
+            if [[ "$theme_name" == "$current" ]]; then
+                echo "* $theme_name (current)"
+            else
+                echo "  $theme_name"
+            fi
+        fi
+    done
+else
+    echo "No themes installed."
+    echo "Run 'deadcode-menu' to install themes."
+fi

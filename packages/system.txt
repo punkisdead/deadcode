@@ -1,0 +1,9 @@
+# System utilities
+acpi
+acpid
+upower
+timeshift
+htop
+btop
+neofetch
+firefox-esr

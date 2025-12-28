@@ -1,0 +1,76 @@
+#!/bin/bash
+# Deadcode - Update System
+# Usage: deadcode-update
+
+set -euo pipefail
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+DEADCODE_PATH="${HOME}/.local/share/deadcode"
+MIGRATIONS_DIR="${DEADCODE_PATH}/migrations"
+MIGRATIONS_STATE="${HOME}/.local/state/deadcode/migrations"
+
+echo -e "${BLUE}Deadcode Update${NC}"
+echo ""
+
+# Check installation
+if [[ ! -d "$DEADCODE_PATH" ]]; then
+    echo -e "${RED}Error: Deadcode installation not found${NC}"
+    exit 1
+fi
+
+# Update repository
+echo -e "${BLUE}Updating deadcode repository...${NC}"
+cd "$DEADCODE_PATH"
+if git pull --autostash; then
+    echo -e "${GREEN}Repository updated${NC}"
+else
+    echo -e "${YELLOW}Warning: Could not update repository${NC}"
+fi
+
+# Run migrations
+if [[ -d "$MIGRATIONS_DIR" ]]; then
+    echo ""
+    echo -e "${BLUE}Running migrations...${NC}"
+    mkdir -p "$MIGRATIONS_STATE"
+
+    for migration in "$MIGRATIONS_DIR"/*.sh; do
+        [[ -f "$migration" ]] || continue
+        migration_name=$(basename "$migration")
+
+        if [[ ! -f "$MIGRATIONS_STATE/$migration_name" ]]; then
+            echo "  Running: $migration_name"
+            if bash "$migration"; then
+                touch "$MIGRATIONS_STATE/$migration_name"
+            else
+                echo -e "${RED}  Failed: $migration_name${NC}"
+            fi
+        fi
+    done
+fi
+
+# Update system packages
+echo ""
+echo -e "${BLUE}Updating system packages...${NC}"
+if sudo apt-get update && sudo apt-get upgrade -y; then
+    echo -e "${GREEN}Packages updated${NC}"
+else
+    echo -e "${YELLOW}Warning: Package update encountered issues${NC}"
+fi
+
+# Sync dotfiles
+echo ""
+echo -e "${BLUE}Syncing dotfiles...${NC}"
+if [[ -d "${HOME}/dotfiles" ]]; then
+    cd "${HOME}/dotfiles"
+    git pull --autostash || true
+    echo -e "${GREEN}Dotfiles synced${NC}"
+fi
+
+echo ""
+echo -e "${GREEN}Update complete!${NC}"

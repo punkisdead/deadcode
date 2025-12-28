@@ -1,0 +1,58 @@
+#!/bin/bash
+# Deadcode - Sync Dotfiles
+# Usage: deadcode-dotfiles-sync
+
+set -euo pipefail
+
+# Colors
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+DOTFILES_DIR="${HOME}/dotfiles"
+
+echo -e "${BLUE}Syncing dotfiles...${NC}"
+
+if [[ ! -d "$DOTFILES_DIR" ]]; then
+    echo -e "${YELLOW}Dotfiles directory not found: $DOTFILES_DIR${NC}"
+    echo "Run deadcode-menu to set up dotfiles."
+    exit 1
+fi
+
+cd "$DOTFILES_DIR"
+
+# Pull latest changes
+echo "Pulling latest changes..."
+if git pull --autostash; then
+    echo -e "${GREEN}Repository updated${NC}"
+else
+    echo -e "${YELLOW}Could not pull changes (may have local modifications)${NC}"
+fi
+
+# Re-stow packages
+echo ""
+echo "Re-stowing packages..."
+
+STOW_PACKAGES=(
+    "i3"
+    "polybar"
+    "picom"
+    "dunst"
+    "rofi"
+    "alacritty"
+    "kitty"
+    "gtk-3.0"
+    "backgrounds"
+    "zsh"
+)
+
+for pkg in "${STOW_PACKAGES[@]}"; do
+    if [[ -d "${DOTFILES_DIR}/${pkg}" ]]; then
+        echo "  Stowing: $pkg"
+        stow -R "$pkg" 2>/dev/null || stow --adopt "$pkg" 2>/dev/null && stow -R "$pkg" 2>/dev/null || true
+    fi
+done
+
+echo ""
+echo -e "${GREEN}Dotfiles synced!${NC}"

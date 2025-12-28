@@ -1,0 +1,4 @@
+# Printing support
+cups
+cups-client
+system-config-printer

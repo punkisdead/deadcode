@@ -1,0 +1,7 @@
+# Fonts
+fonts-font-awesome
+fonts-noto
+fonts-noto-color-emoji
+fonts-dejavu
+fonts-liberation
+fonts-firacode

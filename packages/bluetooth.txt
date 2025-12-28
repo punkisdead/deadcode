@@ -1,0 +1,4 @@
+# Bluetooth support
+bluez
+bluez-tools
+blueman
