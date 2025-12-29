@@ -1,6 +1,6 @@
 #!/bin/bash
 # Deadcode - Editors Installation
-# Installs Doom Emacs, LazyVim, and VS Code
+# Installs Doom Emacs, Neovim, and VS Code
 
 install_editors() {
     header "Installing editors"
@@ -9,7 +9,7 @@ install_editors() {
     local editors
     editors=$(show_checklist "Select Editors" "Choose which editors to install:" \
         "doom" "Doom Emacs" "OFF" \
-        "lazyvim" "LazyVim (Neovim)" "OFF" \
+        "neovim" "Neovim" "OFF" \
         "vscode" "Visual Studio Code" "OFF")
 
     if [[ -z "$editors" ]]; then
@@ -20,7 +20,7 @@ install_editors() {
         editor="${editor//\"/}"
         case "$editor" in
             doom) install_doom_emacs ;;
-            lazyvim) install_lazyvim ;;
+            neovim) install_neovim ;;
             vscode) install_vscode ;;
         esac
     done
@@ -90,52 +90,17 @@ add_doom_to_path() {
     fi
 }
 
-install_lazyvim() {
-    header "Installing LazyVim"
+install_neovim() {
+    header "Installing Neovim"
 
-    # Install Neovim if not present
-    if ! command_exists nvim; then
-        subheader "Installing Neovim"
-        ensure_package neovim
-    fi
-
-    # Install dependencies
-    ensure_package git
-    ensure_package ripgrep
-    ensure_package fd-find
-
-    # Warn if Node.js is not available (needed for many LSP servers via Mason)
-    if ! command_exists node; then
-        warn "Node.js not found - install via mise for Mason LSP support"
-    fi
-
-    # Check if LazyVim is already installed
-    if [[ -d "${HOME}/.config/nvim" ]] && [[ -f "${HOME}/.config/nvim/lazy-lock.json" ]]; then
-        debug "LazyVim already installed"
+    if command_exists nvim; then
+        debug "Neovim already installed"
         return 0
     fi
 
-    # Backup existing nvim config
-    if [[ -d "${HOME}/.config/nvim" ]]; then
-        warn "Backing up existing nvim config"
-        mv "${HOME}/.config/nvim" "${HOME}/.config/nvim.bak"
-    fi
-    if [[ -d "${HOME}/.local/share/nvim" ]]; then
-        mv "${HOME}/.local/share/nvim" "${HOME}/.local/share/nvim.bak"
-    fi
-    if [[ -d "${HOME}/.local/state/nvim" ]]; then
-        mv "${HOME}/.local/state/nvim" "${HOME}/.local/state/nvim.bak"
-    fi
-    if [[ -d "${HOME}/.cache/nvim" ]]; then
-        mv "${HOME}/.cache/nvim" "${HOME}/.cache/nvim.bak"
-    fi
+    ensure_package neovim
 
-    # Clone LazyVim starter
-    subheader "Cloning LazyVim starter"
-    git clone https://github.com/LazyVim/starter "${HOME}/.config/nvim"
-    rm -rf "${HOME}/.config/nvim/.git"
-
-    success "LazyVim installed - run 'nvim' to complete setup"
+    success "Neovim installed"
 }
 
 install_vscode() {
