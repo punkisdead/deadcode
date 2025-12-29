@@ -103,8 +103,11 @@ install_lazyvim() {
     ensure_package git
     ensure_package ripgrep
     ensure_package fd-find
-    ensure_package nodejs
-    ensure_package npm
+
+    # Warn if Node.js is not available (needed for many LSP servers via Mason)
+    if ! command_exists node; then
+        warn "Node.js not found - install via mise for Mason LSP support"
+    fi
 
     # Check if LazyVim is already installed
     if [[ -d "${HOME}/.config/nvim" ]] && [[ -f "${HOME}/.config/nvim/lazy-lock.json" ]]; then

@@ -5,7 +5,6 @@ direnv
 cmake
 autoconf
 automake
-fastfetch
 ssh-askpass
 gcc
 g++
